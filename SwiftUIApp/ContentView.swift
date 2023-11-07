@@ -240,6 +240,131 @@ struct CustomModifierTwoStepsTransitionView: View {
     }
 }
 
+struct DelayedModifierTransitionView: View {
+
+    private enum FlipDirection {
+        case trailing
+        case leading
+        var anchor: UnitPoint {
+            switch self {
+            case .trailing: .trailing
+            case .leading: .leading
+            }
+        }
+        var opposite: UnitPoint {
+            switch self {
+            case .trailing: .leading
+            case .leading: .trailing
+            }
+        }
+        func degrees(progress: Double) -> Angle {
+            if progress == 0.0 {
+                return .zero
+            }
+            switch self {
+            case .trailing: return .degrees(-90)
+            case .leading: return .degrees(90)
+            }
+        }
+        func offset(for width: Double, progress: Double) -> Double {
+            switch self {
+            case .trailing: width * progress * -0.5
+            case .leading: width * progress * 0.5
+            }
+        }
+    }
+
+    private struct FlipModifier: ViewModifier {
+        let direction: FlipDirection
+        let progress: Double
+        func body(content: Content) -> some View {
+            GeometryReader { geometry in
+                content
+//                    .overlay(
+//                        LinearGradient(colors: [.black.opacity(0.3), .clear], startPoint: direction.opposite, endPoint: direction.anchor)
+//                            .opacity(progress)
+//                            .allowsHitTesting(false)
+//                    )
+                    .rotation3DEffect(
+                        direction.degrees(progress: progress),
+                        axis: (0.0, 1.0, 0.0),
+                        anchor: direction.anchor,
+                        anchorZ: 1.0,
+                        perspective: 1.0
+                    )
+                    .offset(x: direction.offset(for: geometry.size.width, progress: progress))
+            }
+        }
+    }
+
+    @State private var isFlipped = false
+
+    @State private var isFrontShowing = true
+    @State private var isBackShowing = false
+
+    var body: some View {
+        ZStack {
+            Color.brown
+                .ignoresSafeArea()
+                .allowsTightening(false)
+
+            ZStack {
+                if isFrontShowing {
+                    SampleFrontView(onTapFlipToBack: {
+                        isFlipped = true
+                        withAnimation(.linear(duration: 0.5)) {
+                            isFrontShowing = false
+                        }
+                        withAnimation(.linear(duration: 0.5).delay(0.5)) {
+                            isBackShowing = true
+                        }
+                    })
+                    .id("front")
+                    .transition(
+                        .asymmetric(
+                            insertion:
+                                    .modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
+                                    .animation(.linear(duration: 0.5).delay(0.5))
+                            ,
+                            removal:
+                                    .modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
+                                    .animation(.linear(duration: 0.5).delay(0.0))
+                        )
+                    )
+                }
+                if isBackShowing {
+                    SampleBackView(onTapFlipToFront: {
+                        isFlipped = false
+                        withAnimation(.linear(duration: 0.5)) {
+                            isBackShowing = false
+                        }
+                        withAnimation(.linear(duration: 0.5).delay(0.5)) {
+                            isFrontShowing = true
+                        }
+                    })
+                    .id("back")
+                    .transition(
+                        .asymmetric(
+                            insertion:
+                                    .modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
+                                    .animation(.linear(duration: 0.5).delay(0.5))
+                            ,
+                            removal:
+                                    .modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
+                                    .animation(.linear(duration: 0.5).delay(0.0))
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+#Preview("Delayed Modifier") {
+    DelayedModifierTransitionView()
+        .ignoresSafeArea()
+}
+
 #Preview("Conditional Switch") {
     ConditionalSwitchView()
         .ignoresSafeArea()
