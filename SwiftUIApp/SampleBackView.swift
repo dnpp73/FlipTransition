@@ -13,7 +13,7 @@ struct SampleBackView: View {
 
     var body: some View {
         TabView {
-            NavigationStack {
+            NavigationView {
                 VStack {
                     Text("Flip to Front")
                         .frame(maxWidth: 200, maxHeight: 200)

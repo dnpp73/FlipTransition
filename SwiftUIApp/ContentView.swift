@@ -35,19 +35,17 @@ struct BasicOpacityTransitionView: View {
     @State private var isFlipped = false
     var body: some View {
         if isFlipped == false {
-            SampleFrontView(onTapFlipToBack: {
-                withAnimation {
-                    isFlipped = true
-                }
-            })
-            .transition(.opacity)
+            SampleFrontView(onTapFlipToBack: { isFlipped = true })
+            .transition(
+                .opacity
+                    .animation(.default)
+            )
         } else {
-            SampleBackView(onTapFlipToFront: {
-                withAnimation {
-                    isFlipped = false
-                }
-            })
-            .transition(.opacity)
+            SampleBackView(onTapFlipToFront: { isFlipped = false })
+            .transition(
+                .opacity
+                    .animation(.default)
+            )
         }
     }
 }
@@ -62,7 +60,8 @@ struct CombinedTransitionView: View {
                 }
             })
             .transition(
-                .move(edge: .leading).combined(with: .opacity)
+                .move(edge: .leading)
+                .combined(with: .opacity)
             )
         } else {
             SampleBackView(onTapFlipToFront: {
@@ -71,7 +70,8 @@ struct CombinedTransitionView: View {
                 }
             })
             .transition(
-                .move(edge: .trailing).combined(with: .opacity)
+                .move(edge: .trailing)
+                .combined(with: .opacity)
             )
         }
     }
@@ -95,11 +95,14 @@ struct CustomModifierTransitionView: View {
 
     @State private var isFlipped = false
 
+    private let backgroundColor = Color.gray
+    private let duration: TimeInterval = 1.0
+
     var body: some View {
         VStack {
             if isFlipped == false {
                 SampleFrontView(onTapFlipToBack: {
-                    withAnimation(.linear(duration: 1.0)) {
+                    withAnimation(.linear(duration: duration)) {
                         isFlipped = true
                     }
                 })
@@ -110,7 +113,7 @@ struct CustomModifierTransitionView: View {
                 )
             } else {
                 SampleBackView(onTapFlipToFront: {
-                    withAnimation(.linear(duration: 1.0)) {
+                    withAnimation(.linear(duration: duration)) {
                         isFlipped = false
                     }
                 })
@@ -121,7 +124,7 @@ struct CustomModifierTransitionView: View {
                 )
             }
         }
-        .background(.brown)
+        .background(backgroundColor)
     }
 }
 
@@ -187,8 +190,8 @@ struct CustomModifierTwoStepsTransitionView: View {
     @State private var isFrontShowing = true
     @State private var isBackShowing = false
 
-    private let backgroundColor = Color.black
-    private let duration: TimeInterval = 0.6
+    private let backgroundColor = Color.gray
+    private let duration: TimeInterval = 1.0
 
     var body: some View {
         ZStack { // 一瞬両方の View が無くなって空になるタイミングが存在するため、背景の View を指定する場合はもう一段階更に外側に ZStack が必要
@@ -201,7 +204,7 @@ struct CustomModifierTwoStepsTransitionView: View {
                     SampleFrontView(onTapFlipToBack: { isFlipped = true })
                         .transition(
                             .modifier(
-                                active: FlipModifier(direction: .trailing, progress: 1.0),
+                                active:   FlipModifier(direction: .trailing, progress: 1.0),
                                 identity: FlipModifier(direction: .trailing, progress: 0.0)
                             )
                         )
@@ -210,37 +213,42 @@ struct CustomModifierTwoStepsTransitionView: View {
                     SampleBackView(onTapFlipToFront: { isFlipped = false })
                         .transition(
                             .modifier(
-                                active: FlipModifier(direction: .leading, progress: 1.0),
+                                active:   FlipModifier(direction: .leading, progress: 1.0),
                                 identity: FlipModifier(direction: .leading, progress: 0.0)
                             )
                         )
                 }
             }
-            .onChange(of: isFlipped) { (old, new) in
-                withAnimation(.easeIn(duration: duration / 2.0), completionCriteria: .logicallyComplete) {
-                    if new {
-                        isFrontShowing = false
-                    } else {
-                        isBackShowing = false
+            .onChange(of: isFlipped) { new in
+                Task {
+                    withAnimation(.linear(duration: duration / 2.0)) {
+                        if new {
+                            isFrontShowing = false
+                        } else {
+                            isBackShowing = false
+                        }
                     }
-                } completion: {
-                    withAnimation(.easeOut(duration: duration / 2.0), completionCriteria: .logicallyComplete) {
+
+                    try await Task.sleep(nanoseconds: UInt64(duration / 2.0 * Double(1000_000_000)))
+
+                    withAnimation(.linear(duration: duration / 2.0)) {
                         if new {
                             isBackShowing = true
                         } else {
                             isFrontShowing = true
                         }
-                    } completion: {
-                        // nop
                     }
+
+                    try await Task.sleep(nanoseconds: UInt64(duration / 2.0 * Double(1000_000_000)))
+
+                    // finish here
                 }
             }
-
         }
     }
 }
 
-struct DelayedModifierTransitionView: View {
+struct CustomModifierDelayedTransitionView: View {
 
     private enum FlipDirection {
         case trailing
@@ -280,11 +288,11 @@ struct DelayedModifierTransitionView: View {
         func body(content: Content) -> some View {
             GeometryReader { geometry in
                 content
-//                    .overlay(
-//                        LinearGradient(colors: [.black.opacity(0.3), .clear], startPoint: direction.opposite, endPoint: direction.anchor)
-//                            .opacity(progress)
-//                            .allowsHitTesting(false)
-//                    )
+                    .overlay(
+                        LinearGradient(colors: [.black.opacity(0.3), .clear], startPoint: direction.opposite, endPoint: direction.anchor)
+                            .opacity(progress)
+                            .allowsHitTesting(false)
+                    )
                     .rotation3DEffect(
                         direction.degrees(progress: progress),
                         axis: (0.0, 1.0, 0.0),
@@ -302,9 +310,15 @@ struct DelayedModifierTransitionView: View {
     @State private var isFrontShowing = true
     @State private var isBackShowing = false
 
+    private let backgroundColor = Color.gray
+    private let duration: TimeInterval = 1.0
+
+    private let frontTransition = AnyTransition.modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
+    private let backTransition  = AnyTransition.modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
+
     var body: some View {
         ZStack {
-            Color.brown
+            backgroundColor
                 .ignoresSafeArea()
                 .allowsTightening(false)
 
@@ -312,57 +326,47 @@ struct DelayedModifierTransitionView: View {
                 if isFrontShowing {
                     SampleFrontView(onTapFlipToBack: {
                         isFlipped = true
-                        withAnimation(.linear(duration: 0.5)) {
-                            isFrontShowing = false
-                        }
-                        withAnimation(.linear(duration: 0.5).delay(0.5)) {
-                            isBackShowing = true
-                        }
                     })
-                    .id("front")
+                    // .id("front")
                     .transition(
                         .asymmetric(
-                            insertion:
-                                    .modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
-                                    .animation(.linear(duration: 0.5).delay(0.5))
-                            ,
-                            removal:
-                                    .modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
-                                    .animation(.linear(duration: 0.5).delay(0.0))
+                            insertion: frontTransition.animation(.linear(duration: duration / 2.0).delay(duration / 2.0)),
+                            removal:   frontTransition.animation(.linear(duration: duration / 2.0).delay(0.0))
                         )
                     )
                 }
                 if isBackShowing {
                     SampleBackView(onTapFlipToFront: {
                         isFlipped = false
-                        withAnimation(.linear(duration: 0.5)) {
-                            isBackShowing = false
-                        }
-                        withAnimation(.linear(duration: 0.5).delay(0.5)) {
-                            isFrontShowing = true
-                        }
                     })
-                    .id("back")
+                    // .id("back")
                     .transition(
                         .asymmetric(
-                            insertion:
-                                    .modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
-                                    .animation(.linear(duration: 0.5).delay(0.5))
-                            ,
-                            removal:
-                                    .modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
-                                    .animation(.linear(duration: 0.5).delay(0.0))
+                            insertion: backTransition.animation(.linear(duration: duration / 2.0).delay(duration / 2.0)),
+                            removal:   backTransition.animation(.linear(duration: duration / 2.0).delay(0.0))
                         )
                     )
                 }
             }
+            .onChange(of: isFlipped) { new in
+                if new {
+                    withAnimation(.linear(duration: duration / 2.0)) {
+                        isFrontShowing = false
+                    }
+                    withAnimation(.linear(duration: duration / 2.0).delay(duration / 2.0)) {
+                        isBackShowing = true
+                    }
+                } else {
+                    withAnimation(.linear(duration: duration / 2.0)) {
+                        isBackShowing = false
+                    }
+                    withAnimation(.linear(duration: duration / 2.0).delay(duration / 2.0)) {
+                        isFrontShowing = true
+                    }
+                }
+            }
         }
     }
-}
-
-#Preview("Delayed Modifier") {
-    DelayedModifierTransitionView()
-        .ignoresSafeArea()
 }
 
 #Preview("Conditional Switch") {
@@ -392,5 +396,10 @@ struct DelayedModifierTransitionView: View {
 
 #Preview("Two Steps Flip") {
     CustomModifierTwoStepsTransitionView()
+        .ignoresSafeArea()
+}
+
+#Preview("Delayed Flip") {
+    CustomModifierDelayedTransitionView()
         .ignoresSafeArea()
 }
