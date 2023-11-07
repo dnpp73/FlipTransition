@@ -311,10 +311,13 @@ struct CustomModifierDelayedTransitionView: View {
     @State private var isBackShowing = false
 
     private let backgroundColor = Color.gray
-    private let duration: TimeInterval = 3.0
+    private let duration: TimeInterval = 0.6
 
     private let frontTransition = AnyTransition.modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
     private let backTransition  = AnyTransition.modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
+
+    @State private var zindexFront: Double = 1.0
+    @State private var zindexBack: Double = 0.0
 
     var body: some View {
         ZStack {
@@ -327,6 +330,7 @@ struct CustomModifierDelayedTransitionView: View {
                     SampleFrontView(onTapFlipToBack: {
                         isFlipped = true
                     })
+                    .zIndex(zindexFront)
                     // .id("front")
                     .transition(
                         .asymmetric(
@@ -339,6 +343,7 @@ struct CustomModifierDelayedTransitionView: View {
                     SampleBackView(onTapFlipToFront: {
                         isFlipped = false
                     })
+                    .zIndex(zindexBack)
                     // .id("back")
                     .transition(
                         .asymmetric(
@@ -349,19 +354,35 @@ struct CustomModifierDelayedTransitionView: View {
                 }
             }
             .onChange(of: isFlipped) { new in
+                let p1x: Double = 0.15
+                let p1y: Double = 0.0
+                let p2xy: Double = 0.7
+                let p3xy: Double = 1.0 - p2xy
+                let p4x: Double = 1.0 - p1x
+                let p4y: Double = 1.0 - p1y
                 if new {
-                    withAnimation(.linear(duration: duration / 2.0)) {
+                    withAnimation(.timingCurve(p1x, p1y, p2xy, p2xy, duration: duration / 2.0)) {
                         isFrontShowing = false
                     }
-                    withAnimation(.linear(duration: duration / 2.0).delay(duration / 2.0)) {
+                    withAnimation(.timingCurve(p3xy, p3xy, p4x, p4y, duration: duration / 2.0).delay(duration / 2.0)) {
                         isBackShowing = true
                     }
+                    Task {
+                        try await Task.sleep(nanoseconds: UInt64(duration * Double(1000_000_000)))
+                        zindexFront = 0.0
+                        zindexBack = 1.0
+                    }
                 } else {
-                    withAnimation(.linear(duration: duration / 2.0)) {
+                    withAnimation(.timingCurve(p1x, p1y, p2xy, p2xy, duration: duration / 2.0)) {
                         isBackShowing = false
                     }
-                    withAnimation(.linear(duration: duration / 2.0).delay(duration / 2.0)) {
+                    withAnimation(.timingCurve(p3xy, p3xy, p4x, p4y, duration: duration / 2.0).delay(duration / 2.0)) {
                         isFrontShowing = true
+                    }
+                    Task {
+                        try await Task.sleep(nanoseconds: UInt64(duration * Double(1000_000_000)))
+                        zindexFront = 1.0
+                        zindexBack = 0.0
                     }
                 }
             }
