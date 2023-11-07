@@ -96,7 +96,7 @@ struct CustomModifierTransitionView: View {
     @State private var isFlipped = false
 
     private let backgroundColor = Color.gray
-    private let duration: TimeInterval = 1.0
+    private let duration: TimeInterval = 3.0
 
     var body: some View {
         VStack {
@@ -191,7 +191,7 @@ struct CustomModifierTwoStepsTransitionView: View {
     @State private var isBackShowing = false
 
     private let backgroundColor = Color.gray
-    private let duration: TimeInterval = 1.0
+    private let duration: TimeInterval = 3.0
 
     var body: some View {
         ZStack { // 一瞬両方の View が無くなって空になるタイミングが存在するため、背景の View を指定する場合はもう一段階更に外側に ZStack が必要
@@ -311,7 +311,7 @@ struct CustomModifierDelayedTransitionView: View {
     @State private var isBackShowing = false
 
     private let backgroundColor = Color.gray
-    private let duration: TimeInterval = 1.0
+    private let duration: TimeInterval = 3.0
 
     private let frontTransition = AnyTransition.modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
     private let backTransition  = AnyTransition.modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))
