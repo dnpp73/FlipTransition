@@ -7,16 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		19DA25292AFA18B800185967 /* SwiftUIAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19DA25282AFA18B800185967 /* SwiftUIAppApp.swift */; };
+		19DA25292AFA18B800185967 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19DA25282AFA18B800185967 /* App.swift */; };
 		19DA252B2AFA18B800185967 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19DA252A2AFA18B800185967 /* ContentView.swift */; };
 		19DA253C2AFA18CC00185967 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19DA253B2AFA18CC00185967 /* App.swift */; };
 		19DA25432AFA18CC00185967 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 19DA25412AFA18CC00185967 /* Main.storyboard */; };
 		19DA25482AFA18CD00185967 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 19DA25462AFA18CD00185967 /* LaunchScreen.storyboard */; };
+		19DA254E2AFA36D700185967 /* SampleFrontView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19DA254D2AFA36D700185967 /* SampleFrontView.swift */; };
+		19DA25502AFA36DE00185967 /* SampleBackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19DA254F2AFA36DE00185967 /* SampleBackView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		19DA25262AFA18B800185967 /* SwiftUIApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		19DA25282AFA18B800185967 /* SwiftUIAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIAppApp.swift; sourceTree = "<group>"; };
+		19DA25282AFA18B800185967 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		19DA252A2AFA18B800185967 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		19DA252E2AFA18B900185967 /* SwiftUIApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftUIApp.entitlements; sourceTree = "<group>"; };
 		19DA25392AFA18CC00185967 /* UIKitApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UIKitApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +26,8 @@
 		19DA25422AFA18CC00185967 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		19DA25472AFA18CD00185967 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		19DA25492AFA18CD00185967 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		19DA254D2AFA36D700185967 /* SampleFrontView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleFrontView.swift; sourceTree = "<group>"; };
+		19DA254F2AFA36DE00185967 /* SampleBackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleBackView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,8 +69,10 @@
 		19DA25272AFA18B800185967 /* SwiftUIApp */ = {
 			isa = PBXGroup;
 			children = (
-				19DA25282AFA18B800185967 /* SwiftUIAppApp.swift */,
+				19DA25282AFA18B800185967 /* App.swift */,
 				19DA252A2AFA18B800185967 /* ContentView.swift */,
+				19DA254D2AFA36D700185967 /* SampleFrontView.swift */,
+				19DA254F2AFA36DE00185967 /* SampleBackView.swift */,
 				19DA252E2AFA18B900185967 /* SwiftUIApp.entitlements */,
 			);
 			path = SwiftUIApp;
@@ -183,7 +189,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				19DA252B2AFA18B800185967 /* ContentView.swift in Sources */,
-				19DA25292AFA18B800185967 /* SwiftUIAppApp.swift in Sources */,
+				19DA25502AFA36DE00185967 /* SampleBackView.swift in Sources */,
+				19DA25292AFA18B800185967 /* App.swift in Sources */,
+				19DA254E2AFA36D700185967 /* SampleFrontView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
