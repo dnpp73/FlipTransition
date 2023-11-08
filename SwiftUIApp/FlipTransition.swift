@@ -36,6 +36,8 @@ struct FlipTransition<FrontContent, BackContent>: View where FrontContent: View,
     private let front: () -> FrontContent
     private let back: () -> BackContent
 
+    @State private var allowsTighteningContent = true
+
     var body: some View {
         ZStack {
             backgroundColor
@@ -45,16 +47,19 @@ struct FlipTransition<FrontContent, BackContent>: View where FrontContent: View,
             ZStack {
                 if isFrontShowing {
                     front()
-                    .zIndex(zindexFront)
-                    .transition(.flipFront)
+                        .allowsTightening(allowsTighteningContent)
+                        .zIndex(zindexFront)
+                        .transition(.flipFront)
                 }
                 if isBackShowing {
                     back()
-                    .zIndex(zindexBack)
-                    .transition(.flipBack)
+                        .allowsTightening(allowsTighteningContent)
+                        .zIndex(zindexBack)
+                        .transition(.flipBack)
                 }
             }
             .onChange(of: isFlipped) { new in
+                allowsTighteningContent = false
                 let p1x: Double = 0.15
                 let p1y: Double = 0.0
                 let p2xy: Double = 0.7
@@ -84,6 +89,7 @@ struct FlipTransition<FrontContent, BackContent>: View where FrontContent: View,
                         zindexFront = 1.0
                         zindexBack  = 0.0
                     }
+                    allowsTighteningContent = true
                 }
             }
         }
