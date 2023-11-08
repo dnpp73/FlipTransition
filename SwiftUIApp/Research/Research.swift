@@ -1,12 +1,5 @@
 import SwiftUI
 
-struct ContentView: View {
-    var body: some View {
-        CustomModifierTwoStepsTransitionView()
-            .ignoresSafeArea()
-    }
-}
-
 struct ConditionalSwitchView: View {
     @State private var isFlipped = false
     var body: some View {
@@ -311,7 +304,7 @@ struct CustomModifierDelayedTransitionView: View {
     @State private var isBackShowing = false
 
     private let backgroundColor = Color.gray
-    private let duration: TimeInterval = 0.6
+    private let duration: TimeInterval = 3.0
 
     private let frontTransition = AnyTransition.modifier(active: FlipModifier(direction: .trailing, progress: 1.0), identity: FlipModifier(direction: .trailing, progress: 0.0))
     private let backTransition  = AnyTransition.modifier(active: FlipModifier(direction: .leading, progress: 1.0), identity: FlipModifier(direction: .leading, progress: 0.0))

@@ -24,7 +24,9 @@ struct SampleBackView: View {
                 }
                 .listStyle(.plain)
                 .navigationTitle("Back Side")
+                #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
+                #endif
             }
             .tabItem {
                 Label(title: { Text("Back Side") }, icon: { Image(systemName: "minus") })

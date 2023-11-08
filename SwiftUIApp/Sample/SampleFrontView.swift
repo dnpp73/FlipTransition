@@ -21,9 +21,11 @@ struct SampleFrontView: View {
                             onTapFlipToBack()
                         }
                 }
-                .listStyle(.insetGrouped)
                 .navigationTitle("Front Side")
+                #if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
+                .listStyle(.insetGrouped)
+                #endif
             }
             .tabItem {
                 Label(title: { Text("Front Side") }, icon: { Image(systemName: "plus") })
